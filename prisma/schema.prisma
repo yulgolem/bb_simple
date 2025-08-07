@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Context {
+  id             String    @id @default(cuid())
+  tag            String    @unique
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  lastActivityAt DateTime  @default(now())
+
+  phrases Phrase[]
+  boards  Board[]
+}
+
+model Phrase {
+  id        String   @id @default(cuid())
+  contextId String
+  text      String
+  createdAt DateTime @default(now())
+
+  context Context @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  votes   Vote[]
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  phraseId  String
+  userId    String
+  value     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  phrase Phrase @relation(fields: [phraseId], references: [id], onDelete: Cascade)
+
+  @@unique([phraseId, userId])
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  contextId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  context Context    @relation(fields: [contextId], references: [id], onDelete: Cascade)
+  cells   BoardCell[]
+
+  @@unique([contextId, userId])
+}
+
+model BoardCell {
+  id        String  @id @default(cuid())
+  boardId   String
+  row       Int
+  col       Int
+  phraseText String
+  isFree    Boolean @default(false)
+  marked    Boolean @default(false)
+
+  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  @@unique([boardId, row, col])
+}

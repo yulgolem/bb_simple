@@ -1,6 +1,39 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: dark;
+}
+
+html, body {
+  height: 100%;
+}
+
+.min-h-dvh { min-height: 100dvh; }
+
+/* subtle grid background */
+.bg-grid {
+  background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 36px 36px;
+  background-position: -1px -1px;
+  mask-image: radial-gradient(60% 60% at 50% 30%, black 50%, transparent 80%);
+}
+
+@keyframes slow-float {
+  0% { transform: translateY(0px) }
+  50% { transform: translateY(-10px) }
+  100% { transform: translateY(0px) }
+}
+.animate-slow-float { animation: slow-float 16s ease-in-out infinite; }
+
+@keyframes gradient-move {
+  0% { transform: translate3d(-10%, -10%, 0) }
+  50% { transform: translate3d(10%, 10%, 0) }
+  100% { transform: translate3d(-10%, -10%, 0) }
+}
+.animate-gradient { animation: gradient-move 20s ease-in-out infinite; }
+
+
+:root {
   --background: #ffffff;
   --foreground: #171717;
 }
