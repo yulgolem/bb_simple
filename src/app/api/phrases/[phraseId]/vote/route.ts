@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 
-export async function POST(req: Request, { params }: { params: { phraseId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ phraseId: string }> }) {
   try {
+    const { phraseId } = await params;
     const form = await req.formData();
     const delta = Number(form.get("delta"));
     const value = delta === 1 ? 1 : -1;
@@ -16,13 +17,13 @@ export async function POST(req: Request, { params }: { params: { phraseId: strin
 
     // upsert vote
     await prisma.vote.upsert({
-      where: { phraseId_userId: { phraseId: params.phraseId, userId } },
+      where: { phraseId_userId: { phraseId, userId } },
       update: { value },
-      create: { phraseId: params.phraseId, userId, value },
+      create: { phraseId, userId, value },
     });
 
     // redirect back
-    const phrase = await prisma.phrase.findUnique({ where: { id: params.phraseId }, include: { context: true } });
+    const phrase = await prisma.phrase.findUnique({ where: { id: phraseId }, include: { context: true } });
     const tag = phrase?.context.tag ?? "";
     return NextResponse.redirect(new URL(`/c/${tag}`, req.url));
   } catch (e) {

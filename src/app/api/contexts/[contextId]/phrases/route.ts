@@ -6,18 +6,19 @@ const BodySchema = z.object({ text: z.string().trim().min(1).max(100) });
 
 export async function POST(
   req: Request,
-  { params }: { params: { contextId: string } }
+  { params }: { params: Promise<{ contextId: string }> }
 ) {
   try {
+    const { contextId } = await params;
     const formData = await req.formData();
     const text = String(formData.get("text") || "");
     const { text: validText } = BodySchema.parse({ text });
 
     const phrase = await prisma.phrase.create({
-      data: { contextId: params.contextId, text: validText },
+      data: { contextId, text: validText },
     });
 
-    return NextResponse.redirect(new URL(`/c/${await getTag(params.contextId)}`, req.url));
+    return NextResponse.redirect(new URL(`/c/${await getTag(contextId)}`, req.url));
   } catch (e) {
     return NextResponse.json({ error: "Invalid data" }, { status: 400 });
   }
