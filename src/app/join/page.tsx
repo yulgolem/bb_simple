@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 
-export default function JoinPage({ searchParams }: { searchParams: { tag?: string } }) {
-  const tag = (searchParams?.tag || "").trim().toLowerCase();
+export default async function JoinPage({ searchParams }: { searchParams: Promise<{ tag?: string }> }) {
+  const { tag: rawTag } = await searchParams;
+  const tag = (rawTag || "").trim().toLowerCase();
   if (!tag) {
     redirect("/");
   }

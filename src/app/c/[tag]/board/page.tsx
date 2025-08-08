@@ -11,8 +11,9 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export default async function BoardPage({ params }: { params: { tag: string } }) {
-  const tag = decodeURIComponent(params.tag).toLowerCase();
+export default async function BoardPage({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag: rawTag } = await params;
+  const tag = decodeURIComponent(rawTag).toLowerCase();
   const context = await prisma.context.findUnique({ where: { tag }, include: { phrases: { include: { votes: true } } } });
   if (!context) notFound();
 

@@ -3,8 +3,9 @@ import Link from "next/link";
 import { PlusCircle, Rocket, ThumbsUp, ThumbsDown } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
-export default async function ContextPage({ params }: { params: { tag: string } }) {
-  const tag = decodeURIComponent(params.tag).toLowerCase();
+export default async function ContextPage({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag: rawTag } = await params;
+  const tag = decodeURIComponent(rawTag).toLowerCase();
   if (!tag) notFound();
 
   // Upsert context by tag
